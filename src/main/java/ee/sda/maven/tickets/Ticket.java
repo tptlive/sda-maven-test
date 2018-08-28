@@ -8,10 +8,10 @@ public class Ticket {
   private int price;
   private LocalDateTime timestamp;
 
-  public Ticket(Person person, int price) {
+  public Ticket(Person person, int price, LocalDateTime timestamp) {
     this.person = person;
     this.price = price;
-    this.timestamp = LocalDateTime.now();
+    this.timestamp = timestamp;
   }
 
   public Person getPerson() {

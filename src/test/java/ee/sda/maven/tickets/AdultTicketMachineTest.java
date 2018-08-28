@@ -2,9 +2,6 @@ package ee.sda.maven.tickets;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -17,7 +14,7 @@ import static org.mockito.Mockito.*;
 //@RunWith(MockitoJUnitRunner.class)
 public class AdultTicketMachineTest {
 
-//  @Mock
+  //  @Mock
   private DiscountCalculator discountCalculator;
 
   private Clock clock = Clock.fixed(Instant.parse("2018-08-27T10:00:00Z"), ZoneId.of("Europe/Tallinn"));
@@ -43,7 +40,7 @@ public class AdultTicketMachineTest {
       assertNotNull(e.getTimestamp());
       assertEquals(LocalDateTime.now(clock), e.getTimestamp());
 
-      verify(discountCalculator).calculate(any());
+      verify(discountCalculator, never()).calculate(any());
     }
   }
 
@@ -60,7 +57,7 @@ public class AdultTicketMachineTest {
     // then
     assertEquals(100, result.getPrice());
     assertEquals(person, result.getPerson());
-    // assertEquals(LocalDateTime.now(), result.getTimestamp());
+    assertEquals(LocalDateTime.now(clock), result.getTimestamp());
     assertNotNull(result.getTimestamp());
   }
 
@@ -77,10 +74,41 @@ public class AdultTicketMachineTest {
     // then
     assertEquals(10, result.getPrice());
     assertEquals(person, result.getPerson());
-    // assertEquals(LocalDateTime.now(), result.getTimestamp());
+    assertEquals(LocalDateTime.now(clock), result.getTimestamp());
     assertNotNull(result.getTimestamp());
 
     verify(discountCalculator).calculate(person);
+  }
+
+  @Test
+  public void buy_ThrowsForbiddenAgeException_IfPersonAgeIsBelow18() throws NoPersonDataException {
+    // given
+    Person person = new Person(10);
+    AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+
+    // when
+    try {
+      adultTicketMachine.buy(person);
+      fail("no exception was thrown");
+    } catch (ForbiddenAgeException e) {
+      // then
+      assertEquals("Ticket sale is not allowed for this age: 10", e.getMessage());
+      assertEquals(LocalDateTime.now(clock), e.getTimestamp());
+    }
+  }
+
+  @Test
+  public void buy_ReturnsTicket_IfPersonAgeIs18() throws NoPersonDataException {
+    // given
+    Person person = new Person(18);
+    AdultTicketMachine adultTicketMachine = new AdultTicketMachine(discountCalculator, 100, clock);
+
+    // when
+    Ticket result = adultTicketMachine.buy(person);
+
+    // then
+    assertEquals(100, result.getPrice());
+    assertEquals(person, result.getPerson());
   }
 
 }
