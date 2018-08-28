@@ -1,5 +1,7 @@
 package ee.sda.maven.tickets;
 
+import java.util.Objects;
+
 public class Person {
 
   private int age;
@@ -20,6 +22,20 @@ public class Person {
 
   public PersonStatus getStatus() {
     return status;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Person person = (Person) o;
+    return age == person.age &&
+        status == person.status;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(age, status);
   }
 
   @Override
