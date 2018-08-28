@@ -1,6 +1,7 @@
 package ee.sda.maven.tickets;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Ticket {
 
@@ -24,6 +25,21 @@ public class Ticket {
 
   public LocalDateTime getTimestamp() {
     return timestamp;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Ticket ticket = (Ticket) o;
+    return price == ticket.price &&
+        Objects.equals(person, ticket.person) &&
+        Objects.equals(timestamp, ticket.timestamp);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(person, price, timestamp);
   }
 
   @Override
